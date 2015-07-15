@@ -1,0 +1,10 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+_ecentria_rest_bundle:
+    resource: "@EcentriaRestBundle/Resources/config/routing.yml"
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /api/doc
