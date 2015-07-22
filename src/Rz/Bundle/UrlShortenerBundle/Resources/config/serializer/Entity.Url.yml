@@ -1,0 +1,4 @@
+Rz\Bundle\UrlShortenerBundle\Entity\Url:
+    properties:
+        id:
+            xml_attribute: true

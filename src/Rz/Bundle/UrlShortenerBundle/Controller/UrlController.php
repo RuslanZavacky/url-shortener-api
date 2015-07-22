@@ -2,10 +2,7 @@
 
 namespace Rz\Bundle\UrlShortenerBundle\Controller;
 
-use Rz\Bundle\UrlShortenerBundle\Entity\Url;
 use Rz\Bundle\UrlShortenerBundle\Services\Shortener;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as FOS;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -21,7 +18,7 @@ use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
  *
  * @package UrlShortenerBundle\Controller
  */
-class UrlController extends FOSRestController implements ClassResourceInterface
+class UrlController extends ControllerAbstract
 {
     /**
      * @Route("/")
@@ -64,85 +61,5 @@ class UrlController extends FOSRestController implements ClassResourceInterface
         }
 
         return new Response('', Response::HTTP_NOT_FOUND);
-    }
-
-    /**
-     *
-     * @param Url $url
-     * @param Request $request
-     *
-     * @FOS\Route(
-     *      pattern = "/api/1.0/urls",
-     *      options = {
-     *          "expose" = true
-     *      }
-     * )
-     *
-     * @Sensio\ParamConverter(
-     *      "url",
-     *      class="Rz\Bundle\UrlShortenerBundle\Entity\Url",
-     *      converter = "url_shortener.converter.url",
-     * )
-     *
-     * @Method({"POST"})
-     *
-     * @return JsonResponse
-     */
-    public function postAction(Url $url, Request $request)
-    {
-        $shortener = $this->getShortener();
-
-        if ($encoded = $shortener->encode($url)) {
-            if ($encoded->isNew()) {
-                // Notify only when record is created
-                $shortener->notify(
-                    $encoded,
-                    Shortener::NOTIFY_TYPE_CREATE,
-                    $this->getClientInfoFromRequest($request)
-                );
-            }
-
-            return new JsonResponse($encoded->toArray());
-        }
-
-        return new JsonResponse([]);
-    }
-
-    /**
-     * @Route("/api/1.0/urls/{encoded}/decode")
-     * @Method({"GET"})
-     *
-     * @param null $encoded
-     * @return JsonResponse
-     */
-    public function getDecodeAction($encoded = null)
-    {
-        $shortener = $this->getShortener();
-
-        if ($url = $shortener->decode($encoded)) {
-            return new JsonResponse($url->toArray());
-        }
-
-        return new JsonResponse([]);
-    }
-
-    /**
-     * @return Shortener
-     */
-    private function getShortener()
-    {
-        return $this->get('url_shortener.shortener');
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    private function getClientInfoFromRequest(Request $request)
-    {
-        return [
-            'ip'         => $request->getClientIp(),
-            'user-agent' => $request->headers->get('User-Agent')
-        ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Rz\Bundle\UrlShortenerBundle\Entity;
 
+use Ecentria\Libraries\EcentriaRestBundle\Entity\AbstractCrudEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,7 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   name="url_stat"
  * )
  */
-class UrlStat
+class UrlStat extends AbstractCrudEntity
 {
     /**
      * @ORM\Id
@@ -64,6 +65,33 @@ class UrlStat
      * @ORM\Column(type="datetime")
      */
     private $created;
+
+    /**
+     * Get Primary Key
+     *
+     * @return integer
+     */
+    public function getPrimaryKey()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * Ids getter
+     *
+     * @return array
+     */
+    public function getIds()
+    {
+        return array(
+            'id'  => $this->getId()
+        );
+    }
+
+    public function setIds($ids)
+    {
+        return $this;
+    }
 
     /**
      * @return string
@@ -135,5 +163,15 @@ class UrlStat
     public function setUserAgent($userAgent)
     {
         $this->userAgent = $userAgent;
+    }
+
+    public function toArray()
+    {
+        return [
+            'id' => $this->getId(),
+            'ip' => $this->getIp(),
+            'user-agent' => $this->getUserAgent(),
+            'created' => $this->getCreated()
+        ];
     }
 } 

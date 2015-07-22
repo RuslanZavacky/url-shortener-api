@@ -2,6 +2,7 @@
 
 namespace Rz\Bundle\UrlShortenerBundle\Entity;
 
+use Ecentria\Libraries\EcentriaRestBundle\Entity\AbstractCrudEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   }
  * )
  */
-class Url
+class Url extends AbstractCrudEntity
 {
     /**
      * @ORM\Id
@@ -149,6 +150,33 @@ class Url
      * @var bool
      */
     private $new = false;
+
+    /**
+     * Get Primary Key
+     *
+     * @return integer
+     */
+    public function getPrimaryKey()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * Ids getter
+     *
+     * @return array
+     */
+    public function getIds()
+    {
+        return array(
+            'id'  => $this->getId()
+        );
+    }
+
+    public function setIds($ids)
+    {
+        return $this;
+    }
 
     /**
      * @return mixed
