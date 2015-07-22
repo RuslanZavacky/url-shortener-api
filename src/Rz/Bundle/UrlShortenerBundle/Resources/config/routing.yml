@@ -1,0 +1,6 @@
+url:
+    type:     rest
+    prefix:   /api/v1/
+    resource: "@RzUrlApiBundle/Resources/config/routing/api.yml"
+    defaults:
+        _format: json

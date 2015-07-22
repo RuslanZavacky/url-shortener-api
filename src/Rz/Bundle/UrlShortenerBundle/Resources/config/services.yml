@@ -1,0 +1,37 @@
+parameters:
+    url_shortener.shortener.class: Rz\Bundle\UrlShortenerBundle\Services\Shortener
+    url_shortener.encoder.base.class: Rz\Bundle\UrlShortenerBundle\Services\Encoder\Base
+    url_shortener.converter.url.class: Rz\Bundle\UrlShortenerBundle\Services\Converter\UrlConverter
+    url_shortener.listeners.stats.class: Rz\Bundle\UrlShortenerBundle\EventListener\StatsListener
+    url_shortener.listeners.message.class: Rz\Bundle\UrlShortenerBundle\EventListener\MessageListener
+
+services:
+    url_shortener.encoder.base:
+        class: %url_shortener.encoder.base.class%
+
+    url_shortener.shortener:
+        class: %url_shortener.shortener.class%
+        arguments:
+            - @url_shortener.encoder.base
+            - @router.default
+            - @doctrine.orm.default_entity_manager
+            - @event_dispatcher
+
+    url_shortener.converter.url:
+        class: %url_shortener.converter.url.class%
+        arguments:
+            - @jms_serializer.serializer
+        tags:
+            - { name: request.param_converter, converter: url_shortener.converter.url }
+
+    url_shortener.listeners.stats:
+        class: %url_shortener.listeners.stats.class%
+        arguments:
+            - @doctrine.orm.default_entity_manager
+        tags:
+            - { name: kernel.event_listener, event: url_shortener.events.notify, method: notify }
+
+    url_shortener.listeners.message:
+        class: %url_shortener.listeners.message.class%
+        tags:
+            - { name: kernel.event_listener, event: url_shortener.events.notify, method: notify }

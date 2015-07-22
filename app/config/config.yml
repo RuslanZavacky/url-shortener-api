@@ -1,7 +1,6 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
-    - { resource: services.yml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -78,3 +77,26 @@ doctrine_migrations:
     namespace: Application\Migrations
     table_name: migration_versions
     name: Application Migrations
+
+url_shortener:
+  messaging:
+    enabled: true
+    producer_name: notification
+  stats:
+    enabled: true
+
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:      ogre.latvia.intechsystems.lv
+            port:      5672
+            user:      veyron
+            password:  veyron1234
+            vhost:     /
+            lazy:      true
+    producers:
+        notification:
+            connection: default
+            exchange_options:
+                name: url_shortener_notification
+                type: topic

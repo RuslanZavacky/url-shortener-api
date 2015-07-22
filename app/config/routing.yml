@@ -1,5 +1,5 @@
 app:
-    resource: "@AppBundle/Controller/"
+    resource: "@UrlShortenerBundle/Controller/"
     type:     annotation
 
 _ecentria_rest_bundle:

@@ -1,6 +1,0 @@
-communication:
-    type:     rest
-    prefix:   /api/v1/
-    resource: "@EcentriaCommunicationApiBundle/Resources/config/routing/api.yml"
-    defaults:
-        _format: json
