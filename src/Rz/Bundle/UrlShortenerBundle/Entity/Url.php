@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
 
 /**
  * @ORM\Entity
@@ -36,8 +37,6 @@ class Url extends AbstractCrudEntity
      *   message="URL should not be blank"
      * )
      *
-     * @JMS\Type("string")
-     *
      * @ORM\Column(type="string", length=4000, unique=false, nullable=false)
      */
     private $url;
@@ -51,16 +50,12 @@ class Url extends AbstractCrudEntity
      *   message="URL should not be blank"
      * )
      *
-     * @JMS\Type("string")
-     *
      * @ORM\Column(type="string", length=4000, unique=false, nullable=false)
      */
     private $originalUrl;
 
     /**
      * @var array
-     *
-     * @JMS\Type("array")
      *
      * @ORM\Column(name="data", type="json_array", nullable=true)
      */
@@ -70,15 +65,11 @@ class Url extends AbstractCrudEntity
      * @var array
      *
      * @ORM\Column(type="json_array", nullable=true)
-     *
-     * @JMS\Type("array")
      */
     private $queryParam;
 
     /**
      * @var string
-     *
-     * @JMS\Type("string")
      *
      * @ORM\Column(type="string", length=128, unique=true, nullable=true)
      */
@@ -87,16 +78,12 @@ class Url extends AbstractCrudEntity
     /**
      * @var string
      *
-     * @JMS\Type("string")
-     *
      * @ORM\Column(type="string", length=200, unique=true, nullable=true)
      */
     private $shortUrl;
 
     /**
      * @var integer
-     *
-     * @JMS\Type("integer")
      *
      * @ORM\Column(type="integer", unique=false, nullable=false)
      */
@@ -121,16 +108,12 @@ class Url extends AbstractCrudEntity
     /**
      * @var integer
      *
-     * @JMS\Type("integer")
-     *
      * @ORM\Column(type="integer", nullable=false)
      */
     private $redirectCount = 0;
 
     /**
      * @var integer
-     *
-     * @JMS\Type("integer")
      *
      * @ORM\Column(type="integer", nullable=false)
      */
@@ -142,6 +125,15 @@ class Url extends AbstractCrudEntity
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $lastRedirectOn;
+
+    /**
+     * Statistics
+     *
+     * @var UrlStat
+     * @ORM\OneToMany(targetEntity="UrlStat", mappedBy="Url", fetch="EXTRA_LAZY", cascade={"persist"})
+     * @EcentriaAnnotation\PropertyRestriction({"update"})
+     */
+    private $Statistics;
 
     /**
      * If new, than it never existed in database before.
@@ -169,7 +161,7 @@ class Url extends AbstractCrudEntity
     public function getIds()
     {
         return array(
-            'id'  => $this->getId()
+            'code'  => $this->getCode()
         );
     }
 
@@ -400,6 +392,22 @@ class Url extends AbstractCrudEntity
     public function setLastRedirectOn($lastRedirectOn)
     {
         $this->lastRedirectOn = $lastRedirectOn;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatistics()
+    {
+        return $this->Statistics;
+    }
+
+    /**
+     * @param mixed $Statistics
+     */
+    public function setStatistics($Statistics)
+    {
+        $this->Statistics = $Statistics;
     }
 
     public function toArray()

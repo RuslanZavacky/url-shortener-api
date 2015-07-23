@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new Ecentria\Libraries\EcentriaRestBundle\EcentriaRestBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
+            new Bazinga\Bundle\HateoasBundle\BazingaHateoasBundle(),
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
         );

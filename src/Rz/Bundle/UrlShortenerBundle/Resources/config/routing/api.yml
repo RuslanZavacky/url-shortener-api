@@ -1,0 +1,4 @@
+shortener_api_api:
+    type:     rest
+    name_prefix: shortener_
+    resource: Rz\Bundle\UrlShortenerBundle\Controller\ApiController

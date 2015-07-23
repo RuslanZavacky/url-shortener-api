@@ -9,6 +9,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class UrlShortenerBundle extends Bundle
 {
+    const URL_GO = 'shortener_go';
+
     /**
      * Builds the bundle
      *

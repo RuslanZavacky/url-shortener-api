@@ -1,4 +1,7 @@
 Rz\Bundle\UrlShortenerBundle\Entity\Url:
+    xml_root_name: url
     properties:
         id:
             xml_attribute: true
+        Statistics:
+            exclude: true

@@ -28,29 +28,29 @@ class UrlController extends ControllerAbstract
      */
     public function getAction()
     {
-        return new JsonResponse([]);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
      * @Route(
-     *   "/go/{encoded}/{index}",
-     *   name="app_url_go",
-     *   defaults={"index" = 1},
-     *   requirements={"encoded"=".+", "index"="\d+"}
+     *   "/go/{code}/{index}",
+     *   name="shortener_go",
+     *   defaults={"index" = 1, "code"=""},
+     *   requirements={"code"=".+", "index"="\d+"}
      * )
      * @Method({"GET"})
      *
-     * @param string $encoded
+     * @param string $code
      * @param string $index
      * @param Request $request
      *
      * @return RedirectResponse
      */
-    public function goAction($encoded = null, $index = null, Request $request)
+    public function goAction($code = null, $index = null, Request $request)
     {
         $shortener = $this->getShortener();
 
-        if ($url = $shortener->decode($encoded, $index)) {
+        if ($url = $shortener->decode($code, $index)) {
             $shortener->notify(
                 $url,
                 Shortener::NOTIFY_TYPE_REDIRECT,
@@ -60,6 +60,6 @@ class UrlController extends ControllerAbstract
             return new RedirectResponse($url->getOriginalUrl());
         }
 
-        return new Response('', Response::HTTP_NOT_FOUND);
+        return $this->view(null, Response::HTTP_NOT_FOUND);
     }
 }

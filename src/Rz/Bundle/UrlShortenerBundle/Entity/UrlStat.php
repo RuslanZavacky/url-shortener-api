@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Rz\Bundle\UrlShortenerBundle\Entity\Repository\UrlStatRepository")
  * @ORM\Table(
  *   name="url_stat"
  * )
@@ -25,9 +25,7 @@ class UrlStat extends AbstractCrudEntity
     /**
      * @var string
      *
-     * @JMS\Type("integer")
-     *
-     * @ORM\ManyToOne(targetEntity="Url")
+     * @ORM\ManyToOne(targetEntity="Url", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="url_id", referencedColumnName="id")
      */
     private $Url;

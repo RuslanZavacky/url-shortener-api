@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use JMS\Serializer\Serializer;
+use Rz\Bundle\UrlShortenerBundle\Helpers;
 
 class UrlConverter implements ParamConverterInterface
 {
@@ -16,7 +17,7 @@ class UrlConverter implements ParamConverterInterface
      *
      * @var Serializer
      */
-    private $serializer;
+    protected $serializer;
 
     /**
      * Constructor
@@ -41,28 +42,10 @@ class UrlConverter implements ParamConverterInterface
         $name = $configuration->getName();
         $class = $configuration->getClass();
 
-        $contentDecoded = json_decode($request->getContent(), true);
-
-        $contentDecoded['original_url'] = $contentDecoded['url'];
-
-        $parsedUrl = parse_url($contentDecoded['url']);
-
-        $urlParts = $parsedUrl;
-
-        if (!empty($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $parsedQuery);
-
-            if ($parsedQuery) {
-                ksort($parsedQuery);
-                $urlParts['query'] = http_build_query($parsedQuery);
-                $contentDecoded['query_param'] = $parsedQuery;
-            }
-        }
-
-        $contentDecoded['url'] = $this->buildUrl($urlParts);
+        $content = json_decode($request->getContent(), true);
 
         /** @var Url $model */
-        $model = $this->serializer->deserialize(json_encode($contentDecoded), $class, 'json');
+        $model = $this->deserializeUrl($content, $class);
 
         $request->attributes->set($name, $model);
         $request->attributes->set(Alias::DATA, $name);
@@ -82,19 +65,27 @@ class UrlConverter implements ParamConverterInterface
         return true;
     }
 
-    private function buildUrl($url = [])
+    protected function deserializeUrl($content, $class)
     {
-        $scheme = isset($url['scheme']) ? $url['scheme'] . '://' : '';
-        $host = isset($url['host']) ? $url['host'] : '';
-        $port = isset($url['port']) ? ':' . $url['port'] : '';
-        $user = isset($url['user']) ? $url['user'] : '';
-        $pass = isset($url['pass']) ? ':' . $url['pass'] : '';
-        $pass = ($user || $pass) ? "$pass@" : '';
-        $path = isset($url['path']) ? $url['path'] : '';
-        $query = isset($url['query']) ? '?' . $url['query'] : '';
-        $fragment = isset($url['fragment']) ? '#' . $url['fragment'] : '';
+        $content['original_url'] = $content['url'];
 
-        return "$scheme$user$pass$host$port$path$query$fragment";
+        $parsedUrl = parse_url($content['url']);
+
+        $urlParts = $parsedUrl;
+
+        if (!empty($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $parsedQuery);
+
+            if ($parsedQuery) {
+                ksort($parsedQuery);
+                $urlParts['query'] = http_build_query($parsedQuery);
+                $content['query_param'] = $parsedQuery;
+            }
+        }
+
+        $content['url'] = Helpers\Url::buildUrl($urlParts);
+
+        /** @var Url $model */
+        return $this->serializer->deserialize(json_encode($content), $class, 'json');
     }
-
 } 

@@ -20,19 +20,11 @@ class UrlControllerTest extends WebTestCase
         $client = static::createClient();
 
         $params = [
-            'url' => 'http://opticsplanet.com',
-            'data' => [
-                'user_id' => 123
-            ],
-            'query_params' => [
-                'utm_source' => 'source',
-                'utm_label' => 'label',
-                'utm_action' => 'action'
-            ]
+            'url' => 'http://opticsplanet.com'
         ];
 
-        $crawler = $client->request('POST', '/api/1.0/urls', [], [], [], json_encode($params));
+        $crawler = $client->request('POST', '/api/v1/urls', [], [], [], json_encode($params));
 
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
     }
 }

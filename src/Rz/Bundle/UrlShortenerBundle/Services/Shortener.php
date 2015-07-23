@@ -2,6 +2,11 @@
 
 namespace Rz\Bundle\UrlShortenerBundle\Services;
 
+use Hateoas\Representation\CollectionRepresentation;
+use Hateoas\Representation\PaginatedRepresentation;
+use Rz\Bundle\UrlShortenerBundle\Entity\Repository\UrlStatRepository;
+use Rz\Bundle\UrlShortenerBundle\Model\StatisticsCollectionParameters;
+use Rz\Bundle\UrlShortenerBundle\UrlShortenerBundle;
 use Rz\Bundle\UrlShortenerBundle\UrlShortenerEvents;
 use Rz\Bundle\UrlShortenerBundle\Event\UrlEvent;
 use Rz\Bundle\UrlShortenerBundle\Services\Encoder\Base;
@@ -84,14 +89,14 @@ class Shortener
 
                 $url->setCode($this->encoder->encode($url->getId()));
 
-                $params = ['encoded' => $url->getCode()];
+                $params = ['code' => $url->getCode()];
 
                 if (!$url->isDefaultSequence()) {
                     $params['index'] = $url->getSequence();
                 }
 
                 $url->setShortUrl(
-                    $this->router->generate('app_url_go', $params, UrlGeneratorInterface::ABSOLUTE_URL)
+                    $this->router->generate(UrlShortenerBundle::URL_GO, $params, UrlGeneratorInterface::ABSOLUTE_URL)
                 );
 
                 $this->em->persist($url);
@@ -99,21 +104,20 @@ class Shortener
             }
 
             $this->em->getConnection()->commit();
+
+            return $url;
         } catch (\Exception $e) {
             $this->em->getConnection()->rollBack();
 
             throw $e;
         }
-
-        return $url;
     }
 
     /**
      * @param string $urlEncoded
-     * @param null|int $index
      * @return Url
      */
-    public function decode($urlEncoded, $index = null)
+    public function decode($urlEncoded)
     {
         $repository = $this->em->getRepository('Rz\Bundle\UrlShortenerBundle\Entity\Url');
 
@@ -124,6 +128,41 @@ class Shortener
     }
 
     /**
+     * @param int $id
+     * @param StatisticsCollectionParameters $parameters
+     * @return Url
+     */
+    public function statistics($id, StatisticsCollectionParameters $parameters)
+    {
+        /** @var UrlStatRepository $repository */
+        $repository = $this->em->getRepository('Rz\Bundle\UrlShortenerBundle\Entity\UrlStat');
+
+        $count = $repository->getUrlStatCount($id);
+
+        $statistics = $repository->getUrlStats(
+            $id,
+            $parameters->getFirstResult(),
+            $parameters->getMaxResults()
+        );
+
+        $collection = new CollectionRepresentation($statistics);
+
+        $paginatedCollection = new PaginatedRepresentation(
+            $collection,
+            'shortener_get_api_statistics', // route
+            ['id' => $id],
+            $parameters->getPage(),
+            $parameters->getLimit(),
+            $parameters->getPages($count),
+            'page',
+            'limit',
+            true
+        );
+
+        return $paginatedCollection;
+    }
+
+    /**
      * @param Url $url
      * @param string $type
      * @param array $additional
@@ -131,5 +170,15 @@ class Shortener
     public function notify(Url $url, $type = self::NOTIFY_TYPE_REDIRECT, $additional = [])
     {
         $this->dispatcher->dispatch(UrlShortenerEvents::NOTIFY, new UrlEvent($url, $type, $additional));
+    }
+
+    /**
+     * @param array $url
+     * @param string $type
+     * @param array $additional
+     */
+    public function notifyCollection($url = [], $type = self::NOTIFY_TYPE_REDIRECT, $additional = [])
+    {
+//        $this->dispatcher->dispatch(UrlShortenerEvents::NOTIFY, new UrlEvent($url, $type, $additional));
     }
 }

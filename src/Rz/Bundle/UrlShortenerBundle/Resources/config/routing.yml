@@ -1,6 +1,9 @@
-url:
+shortener:
     type:     rest
     prefix:   /api/v1/
-    resource: "@RzUrlApiBundle/Resources/config/routing/api.yml"
+    resource: "@UrlShortenerBundle/Resources/config/routing/api.yml"
     defaults:
         _format: json
+
+shortener_api_url:
+    resource: Rz\Bundle\UrlShortenerBundle\Controller\UrlController

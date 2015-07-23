@@ -1,10 +1,9 @@
-app:
-    resource: "@UrlShortenerBundle/Controller/"
-    type:     annotation
+_shortener_api_bundle:
+    resource: "@UrlShortenerBundle/Resources/config/routing.yml"
 
 _ecentria_rest_bundle:
     resource: "@EcentriaRestBundle/Resources/config/routing.yml"
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
-    prefix:   /api/doc
+    prefix:   /api/v1/doc
