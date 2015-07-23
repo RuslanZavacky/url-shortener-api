@@ -325,7 +325,7 @@ class Url extends AbstractCrudEntity
      */
     public function isNew()
     {
-        return $this->new;
+        return $this->new === true;
     }
 
     /**

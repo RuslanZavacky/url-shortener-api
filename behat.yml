@@ -1,0 +1,21 @@
+default:
+  extensions:
+    Behat\Symfony2Extension:
+      kernel:
+        env: test
+        debug: true
+
+    Behat\MinkExtension:
+      sessions:
+          default:
+              symfony2: ~
+
+  suites:
+    default:
+      type: symfony_bundle
+      bundle: UrlShortenerBundle
+      contexts:
+        - Rz\Bundle\UrlShortenerBundle\Features\Context\FeatureContext:
+#            session: @session
+        - Rz\Bundle\UrlShortenerBundle\Features\Context\ApiContext:
+#            session: @session

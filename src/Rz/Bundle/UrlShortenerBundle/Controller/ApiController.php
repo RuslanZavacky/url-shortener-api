@@ -10,6 +10,7 @@ use Rz\Bundle\UrlShortenerBundle\Services\Shortener;
 use FOS\RestBundle\Controller\Annotations as FOS;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as Sensio;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,7 @@ class ApiController extends ControllerAbstract
                 );
             }
 
-            return $this->view($encoded, ($encoded->isNew() ? Response::HTTP_CREATED : Response::HTTP_OK));
+            return $this->view($encoded, $encoded->isNew() ? Response::HTTP_CREATED : Response::HTTP_OK);
         }
 
         return $this->view(null, Response::HTTP_BAD_REQUEST);
@@ -137,7 +138,7 @@ class ApiController extends ControllerAbstract
         $shortener = $this->getShortener();
 
         if ($url = $shortener->decode($code)) {
-            return $this->view($url, 200);
+            return $this->view($url, 203);
         }
 
         return $this->view(null, Response::HTTP_BAD_REQUEST);
