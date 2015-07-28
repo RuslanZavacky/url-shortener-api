@@ -14,14 +14,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Class ApiController
- *
- * @EcentriaAnnotation\Transactional(
- *      model="Rz\Bundle\UrlShortenerBundle\Entity\Url",
- *      relatedRoute="shortener_go"
- * )
  *
  * @package UrlShortenerBundle\Controller
  */
@@ -141,7 +137,7 @@ class ApiController extends ControllerAbstract
             return $this->view($url, 203);
         }
 
-        return $this->view(null, Response::HTTP_BAD_REQUEST);
+        return $this->view(new Url(), Response::HTTP_BAD_REQUEST);
     }
 
     /**
