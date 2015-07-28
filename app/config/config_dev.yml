@@ -7,6 +7,11 @@ framework:
         strict_requirements: true
     profiler: { only_exceptions: false }
 
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+
 web_profiler:
     toolbar: true
     intercept_redirects: false
