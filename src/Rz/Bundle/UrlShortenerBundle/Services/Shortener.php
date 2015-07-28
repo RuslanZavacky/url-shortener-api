@@ -145,21 +145,14 @@ class Shortener
             $parameters->getMaxResults()
         );
 
-        $collection = new CollectionRepresentation($statistics);
-
-        $paginatedCollection = new PaginatedRepresentation(
-            $collection,
-            'shortener_get_api_statistics', // route
-            ['id' => $id],
-            $parameters->getPage(),
-            $parameters->getLimit(),
-            $parameters->getPages($count),
-            'page',
-            'limit',
-            true
-        );
-
-        return $paginatedCollection;
+        return [
+            'data' => $statistics,
+            'meta' => [
+                'page' => $parameters->getPage(),
+                'limit' => $parameters->getLimit(),
+                'total_pages' => $parameters->getPages($count)
+            ]
+        ];
     }
 
     /**

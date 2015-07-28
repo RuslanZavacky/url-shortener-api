@@ -3,18 +3,13 @@
 namespace Rz\Bundle\UrlShortenerBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use FOS\RestBundle\View\View;
 use Rz\Bundle\UrlShortenerBundle\Entity\Url;
 use Rz\Bundle\UrlShortenerBundle\Model\StatisticsCollectionParameters;
 use Rz\Bundle\UrlShortenerBundle\Services\Shortener;
-use FOS\RestBundle\Controller\Annotations as FOS;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as Sensio;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Class ApiController
@@ -25,28 +20,15 @@ class ApiController extends ControllerAbstract
 {
     /**
      *
-     * @param Url $url
      * @param Request $request
      *
-     * @FOS\Route(
-     *      pattern = "/urls",
-     *      options = {
-     *          "expose" = true
-     *      }
-     * )
-     *
-     * @Sensio\ParamConverter(
-     *      "url",
-     *      class="Rz\Bundle\UrlShortenerBundle\Entity\Url",
-     *      converter = "url_shortener.converter.url",
-     * )
-     *
-     * @Method({"POST"})
-     *
-     * @return View
+     * @return JsonResponse
      */
-    public function postAction(Url $url, Request $request)
+    public function postAction(Request $request)
     {
+        $url = new Url();
+        $url->setup(json_decode($request->getContent(), true));
+
         $shortener = $this->getShortener();
 
         if ($encoded = $shortener->encode($url)) {
@@ -59,34 +41,36 @@ class ApiController extends ControllerAbstract
                 );
             }
 
-            return $this->view($encoded, $encoded->isNew() ? Response::HTTP_CREATED : Response::HTTP_OK);
+            return new JsonResponse(
+                $encoded->toArray(),
+                $encoded->isNew() ? Response::HTTP_CREATED : Response::HTTP_OK
+            );
         }
 
-        return $this->view(null, Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(
+            null,
+            Response::HTTP_BAD_REQUEST
+        );
     }
 
     /**
      *
-     * @param ArrayCollection $urls
      * @param Request $request
      *
-     * @FOS\Route(
-     *      pattern = "/urls/batches",
-     *      options = {
-     *          "expose" = true
-     *      }
-     * )
-     *
-     * @Sensio\ParamConverter(
-     *      "urls",
-     *      class="Rz\Bundle\UrlShortenerBundle\Entity\Url",
-     *      converter = "url_shortener.converter.url_collection",
-     * )
-     *
-     * @return View
+     * @return JsonResponse
      */
-    public function postBatchAction(ArrayCollection $urls, Request $request)
+    public function postBatchAction(Request $request)
     {
+        $urls = new ArrayCollection();
+
+        $records = json_decode($request->getContent(), true);
+        foreach ($records as $record) {
+            $url = new Url();
+            $url->setup($record);
+
+            $urls->add($url);
+        }
+
         $shortener = $this->getShortener();
 
         $responseCollection = [];
@@ -94,7 +78,7 @@ class ApiController extends ControllerAbstract
 
         foreach ($urls as $url) {
             $encoded = $shortener->encode($url);
-            $responseCollection[] = $encoded;
+            $responseCollection[] = $encoded->toArray();
 
             if ($encoded->isNew()) {
                 $notifyCollection[] = $encoded;
@@ -110,63 +94,37 @@ class ApiController extends ControllerAbstract
             );
         }
 
-        return $this->view($responseCollection, Response::HTTP_OK);
+        return new JsonResponse($responseCollection, Response::HTTP_OK);
     }
 
     /**
-     * @FOS\Route(
-     *      pattern="/urls/{code}/decode",
-     *      requirements = {
-     *          "id" = "[\d]+"
-     *      },
-     *      options = {
-     *          "expose" = true
-     *      }
-     * )
-     *
-     * @Method({"GET"})
-     *
      * @param null $code
-     * @return View
+     * @return JsonResponse
      */
     public function getDecodeAction($code = null)
     {
         $shortener = $this->getShortener();
 
         if ($url = $shortener->decode($code)) {
-            return $this->view($url, 203);
+            return new JsonResponse($url->toArray(), Response::HTTP_OK);
         }
 
-        return $this->view(new Url(), Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @FOS\Route(
-     *      pattern="/urls/{id}/statistics",
-     *      requirements = {
-     *          "id" = "[\d]+"
-     *      },
-     *      options = {
-     *          "expose" = true
-     *      }
-     * )
-     * @Method({"GET"})
-     *
-     * @Sensio\ParamConverter(
-     *      "parameters",
-     *      class="Rz\Bundle\UrlShortenerBundle\Model\StatisticsCollectionParameters",
-     *      converter = "ecentria.api.converter.model",
-     *      options = {"query" = true}
-     * )
-     *
-     * @EcentriaAnnotation\AvoidTransaction()
-     *
      * @param string|null $id
-     * @param StatisticsCollectionParameters $parameters
-     * @return View
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function getStatisticsAction($id, StatisticsCollectionParameters $parameters)
+    public function getStatisticsAction($id, Request $request)
     {
-        return $this->view($this->getShortener()->statistics($id, $parameters), 200);
+        return new JsonResponse(
+            $this->getShortener()->statistics(
+                $id,
+                new StatisticsCollectionParameters($request->query->all())
+            ),
+            Response::HTTP_OK
+        );
     }
 }

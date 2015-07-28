@@ -1,6 +1,7 @@
 <?php
 namespace Rz\Bundle\UrlShortenerBundle\Entity\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Rz\Bundle\UrlShortenerBundle\Entity\UrlStat;
 
@@ -41,6 +42,6 @@ class UrlStatRepository extends EntityRepository
             ->setFirstResult($first)
             ->setMaxResults($max)
             ->getQuery()
-            ->getResult();
+            ->getResult(AbstractQuery::HYDRATE_ARRAY);
     }
 } 

@@ -1,9 +1,29 @@
-shortener:
-    type:     rest
-    prefix:   /api/v1/
-    resource: "@UrlShortenerBundle/Resources/config/routing/api.yml"
-    defaults:
-        _format: json
+shortener_api_v1_post_urls:
+    path:      /api/v1/urls
+    defaults:  { _controller: UrlShortenerBundle:Api:post }
+    methods:  [POST]
 
-shortener_api_url:
-    resource: Rz\Bundle\UrlShortenerBundle\Controller\UrlController
+shortener_api_v1_post_urls_batches:
+    path:      /api/v1/urls/batches
+    defaults:  { _controller: UrlShortenerBundle:Api:postBatch }
+    methods:  [POST]
+
+shortener_api_v1_get_decode:
+    path:      /api/v1/urls/{code}/decode
+    defaults:  { _controller: UrlShortenerBundle:Api:getDecode }
+    methods:  [GET]
+
+shortener_api_v1_get_statistics:
+    path:      /api/v1/urls/{id}/statistics
+    defaults:  { _controller: UrlShortenerBundle:Api:getStatistics }
+    methods:  [GET]
+
+shortener_go:
+    path:      /go/{code}/{index}
+    defaults:  { _controller: UrlShortenerBundle:Url:go, index: 1 }
+    methods:  [GET]
+
+shortener_home:
+    path:      /
+    defaults:  { _controller: UrlShortenerBundle:Url:get }
+    methods:  [GET]

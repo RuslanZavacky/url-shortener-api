@@ -10,6 +10,8 @@ use FOS\RestBundle\Controller\Annotations as FOS;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as Sensio;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +23,14 @@ use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
  *
  * @package UrlShortenerBundle\Controller
  */
-class ControllerAbstract extends FOSRestController implements ClassResourceInterface
+class ControllerAbstract extends ContainerAware
 {
     /**
      * @return Shortener
      */
     protected function getShortener()
     {
-        return $this->get('url_shortener.shortener');
+        return $this->container->get('url_shortener.shortener');
     }
 
     /**

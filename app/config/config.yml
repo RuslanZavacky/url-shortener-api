@@ -58,19 +58,12 @@ doctrine:
         auto_mapping: true
 
 sensio_framework_extra:
-    view:
-        annotations: false
-
-fos_rest:
-    param_fetcher_listener: true
-    body_listener: true
-    format_listener: true
-    routing_loader:
-            default_format: json
-    view:
-        view_response_listener: 'force'
-
-nelmio_api_doc: ~
+    router:      { annotations: false }
+    request:     { converters: false, auto_convert: false }
+    view:        { annotations: false }
+    cache:       { annotations: false }
+    security:    { annotations: false }
+    psr_message: { enabled: false }
 
 doctrine_migrations:
     dir_name: %kernel.root_dir%/DoctrineMigrations
@@ -80,10 +73,10 @@ doctrine_migrations:
 
 url_shortener:
   messaging:
-    enabled: true
+    enabled: false
     producer_name: notification
   stats:
-    enabled: true
+    enabled: false
 
 old_sound_rabbit_mq:
     connections:

@@ -2,9 +2,7 @@
 
 namespace Rz\Bundle\UrlShortenerBundle\Model;
 
-use Ecentria\Libraries\EcentriaRestBundle\Validator\Constraints as EcentriaAssert;
-use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as JMS;
+use Doctrine\Common\Util\Inflector;
 
 class StatisticsCollectionParameters
 {
@@ -12,8 +10,6 @@ class StatisticsCollectionParameters
      * Current page
      *
      * @var int
-     *
-     * @JMS\Type("integer")
      */
     public $page = 1;
 
@@ -21,10 +17,24 @@ class StatisticsCollectionParameters
      * Max number of contact to show per page
      *
      * @var int
-     *
-     * @JMS\Type("integer")
      */
     public $limit = 20;
+
+    public function __construct($params = [])
+    {
+        if (empty($params)) {
+            return;
+        }
+
+        $inflector = new Inflector();
+
+        foreach ($params as $key => $value) {
+            $method = $inflector->camelize('set-' . $key);
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
+    }
 
     public function getPage()
     {
@@ -33,7 +43,7 @@ class StatisticsCollectionParameters
 
     public function setPage($page)
     {
-        $this->page = $page;
+        $this->page = (int) $page;
         return $this;
     }
 
@@ -44,7 +54,7 @@ class StatisticsCollectionParameters
 
     public function setLimit($limit)
     {
-        $this->limit = $limit;
+        $this->limit = (int) $limit;
         return $this;
     }
 
@@ -64,6 +74,6 @@ class StatisticsCollectionParameters
         if ($count == 0) {
             return 1;
         }
-        return ceil($count / $this->getLimit());
+        return ceil($count / max(1, $this->getLimit()));
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Rz\Bundle\UrlShortenerBundle\Entity;
 
-use Ecentria\Libraries\EcentriaRestBundle\Entity\AbstractCrudEntity;
+use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
+use Rz\Bundle\UrlShortenerBundle\Helpers;
+
 
 /**
  * @ORM\Entity
@@ -18,7 +18,7 @@ use Ecentria\Libraries\EcentriaRestBundle\Annotation as EcentriaAnnotation;
  *   }
  * )
  */
-class Url extends AbstractCrudEntity
+class Url
 {
     /**
      * @ORM\Id
@@ -103,7 +103,7 @@ class Url extends AbstractCrudEntity
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
      */
-    private $updated;
+    private $updated = null;
 
     /**
      * @var integer
@@ -131,7 +131,6 @@ class Url extends AbstractCrudEntity
      *
      * @var UrlStat
      * @ORM\OneToMany(targetEntity="UrlStat", mappedBy="Url", fetch="EXTRA_LAZY", cascade={"persist"})
-     * @EcentriaAnnotation\PropertyRestriction({"update"})
      */
     private $Statistics;
 
@@ -410,14 +409,74 @@ class Url extends AbstractCrudEntity
         $this->Statistics = $Statistics;
     }
 
+    /**
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    /**
+     * @param \DateTime $updated
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+    }
+
+    public function setup($params = [])
+    {
+        if (empty($params)) {
+            return;
+        }
+
+        $inflector = new Inflector();
+
+        foreach ($params as $key => $value) {
+            $method = $inflector->camelize('set-' . $key);
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
+
+        $this->setOriginalUrl($this->getUrl());
+
+        $parsedUrl = parse_url($this->getUrl());
+
+        $urlParts = $parsedUrl;
+
+        if (!empty($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $parsedQuery);
+
+            if ($parsedQuery) {
+                ksort($parsedQuery);
+                $urlParts['query'] = http_build_query($parsedQuery);
+                $this->setQueryParam($parsedQuery);
+            }
+        }
+
+        $this->setUrl(Helpers\Url::buildUrl($urlParts));
+        $this->setCreated(new \DateTime());
+        $this->setUpdated(new \DateTime());
+    }
+
     public function toArray()
     {
         return [
-            'short_url' => $this->getShortUrl(),
-            'code' => $this->getCode(),
+            'id' => $this->getId(),
             'url' => $this->getUrl(),
+            'original_url' => $this->getOriginalUrl(),
+            'query_param' => $this->getQueryParam() ? $this->getQueryParam() : null,
+            'code' => $this->getCode(),
+            'short_url' => $this->getShortUrl(),
+            'sequence' => $this->getSequence(),
+            'created' => $this->getCreated(),
+            'updated' => $this->getUpdated(),
+            'redirect_count' => $this->getRedirectCount(),
+            'unique_redirect_count' => $this->getUniqueRedirectCount(),
+            'new' => $this->isNew(),
             'data' => $this->getData() ? $this->getData() : null,
-            'query_param' => $this->getQueryParam() ? $this->getQueryParam() : null
         ];
     }
 }

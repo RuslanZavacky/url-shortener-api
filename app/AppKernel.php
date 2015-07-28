@@ -16,11 +16,6 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Rz\Bundle\UrlShortenerBundle\UrlShortenerBundle(),
-            new Ecentria\Libraries\EcentriaRestBundle\EcentriaRestBundle(),
-            new FOS\RestBundle\FOSRestBundle(),
-            new JMS\SerializerBundle\JMSSerializerBundle(),
-            new Bazinga\Bundle\HateoasBundle\BazingaHateoasBundle(),
-            new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
         );
 

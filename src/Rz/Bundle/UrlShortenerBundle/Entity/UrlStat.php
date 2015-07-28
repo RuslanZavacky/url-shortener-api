@@ -1,9 +1,7 @@
 <?php
 namespace Rz\Bundle\UrlShortenerBundle\Entity;
 
-use Ecentria\Libraries\EcentriaRestBundle\Entity\AbstractCrudEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -13,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   name="url_stat"
  * )
  */
-class UrlStat extends AbstractCrudEntity
+class UrlStat
 {
     /**
      * @ORM\Id
@@ -39,8 +37,6 @@ class UrlStat extends AbstractCrudEntity
      *   message="IP should not be blank"
      * )
      *
-     * @JMS\Type("string")
-     *
      * @ORM\Column(type="string", length=100, nullable=false)
      */
     private $ip;
@@ -49,8 +45,6 @@ class UrlStat extends AbstractCrudEntity
      * User Agent
      *
      * @var string
-     *
-     * @JMS\Type("string")
      *
      * @ORM\Column(type="string", length=2000, nullable=true)
      */
