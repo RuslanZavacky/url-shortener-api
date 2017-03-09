@@ -88,10 +88,10 @@ url_shortener:
 old_sound_rabbit_mq:
     connections:
         default:
-            host:      ogre.latvia.intechsystems.lv
+            host:      ~
             port:      5672
-            user:      veyron
-            password:  veyron1234
+            user:      ~
+            password:  ~
             vhost:     /
             lazy:      true
     producers:
